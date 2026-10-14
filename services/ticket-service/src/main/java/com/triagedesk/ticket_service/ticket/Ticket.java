@@ -23,6 +23,12 @@ public class Ticket {
     @Column(nullable = false, length = 20)
     private String priority = "MEDIUM";
 
+    @Column(length = 30)
+    private String category;
+
+    @Column(name = "suggested_reply", columnDefinition = "TEXT")
+    private String suggestedReply;
+
     @Column(name = "created_by", nullable = false, length = 100)
     private String createdBy;
 
@@ -49,6 +55,10 @@ public class Ticket {
     public void setStatus(String status) { this.status = status; }
     public String getPriority() { return priority; }
     public void setPriority(String priority) { this.priority = priority; }
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
+    public String getSuggestedReply() { return suggestedReply; }
+    public void setSuggestedReply(String suggestedReply) { this.suggestedReply = suggestedReply; }
     public String getCreatedBy() { return createdBy; }
     public void setCreatedBy(String createdBy) { this.createdBy = createdBy; }
     public String getAssignedTo() { return assignedTo; }

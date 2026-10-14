@@ -16,9 +16,11 @@ import java.util.UUID;
 public class TicketController {
 
     private final TicketRepository repository;
+    private final AiTriageClient aiClient;
 
-    public TicketController(TicketRepository repository) {
+    public TicketController(TicketRepository repository, AiTriageClient aiClient) {
         this.repository = repository;
+        this.aiClient = aiClient;
     }
 
     public record CreateTicketRequest(
@@ -41,10 +43,20 @@ public class TicketController {
         Ticket ticket = new Ticket();
         ticket.setTitle(request.title());
         ticket.setDescription(request.description());
+        ticket.setCreatedBy(request.createdBy());
+
+        var triage = aiClient.triage(request.title(), request.description());
+        triage.ifPresent(t -> {
+            ticket.setCategory(t.category());
+            ticket.setSuggestedReply(t.suggested_reply());
+        });
+
+        // The user's priority wins; otherwise use the AI's; otherwise the default (MEDIUM)
         if (request.priority() != null) {
             ticket.setPriority(request.priority());
+        } else {
+            triage.ifPresent(t -> ticket.setPriority(t.priority()));
         }
-        ticket.setCreatedBy(request.createdBy());
         return repository.save(ticket);
     }
 
